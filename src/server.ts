@@ -1,12 +1,13 @@
 import { Application } from "express";
 import http from "http";
 import mongoose from "mongoose";
+import envVars from "./app/configs/env";
 const PORT = process.env.PORT || 3000;
 
 const startServer = (app: Application) => {
   const server = http.createServer(app);
   try {
-    mongoose.connect(process.env.DATABASE_URL as string);
+    mongoose.connect(envVars.DATABASE_URL);
 
     server.listen(PORT, () => {
       // eslint-disable-next-line no-console
