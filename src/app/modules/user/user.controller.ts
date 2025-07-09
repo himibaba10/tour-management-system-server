@@ -23,8 +23,8 @@ const createUser = async (req: Request, res: Response) => {
   }
 };
 
-const userCtrollers = {
+const userControllers = {
   createUser,
 };
 
-export default userCtrollers;
+export default userControllers;
