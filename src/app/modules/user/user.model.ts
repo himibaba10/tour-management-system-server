@@ -28,7 +28,7 @@ const userSchema = new Schema<IUser>(
     },
     isVerified: { type: Boolean, default: false },
     role: { type: String, enum: Object.values(Role), default: Role.USER }, // Assuming Role is an enum
-    auths: [authProviderSchema],
+    auths: { type: [authProviderSchema], default: [] },
     bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
     guides: [{ type: Schema.Types.ObjectId, ref: "Guide" }],
   },
