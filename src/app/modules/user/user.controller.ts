@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import httpStatus from "http-status-codes";
 import userServices from "./user.service";
 
-const createUser = async (req: Request, res: Response) => {
+const createUser = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const newUser = await userServices.createUser(req.body);
 
@@ -13,11 +13,7 @@ const createUser = async (req: Request, res: Response) => {
       data: newUser,
     });
   } catch (error: any) {
-    res.status(httpStatus.INTERNAL_SERVER_ERROR).json({
-      success: false,
-      message: `Could not create user - ${error.message}`,
-      error,
-    });
+    next(error);
   }
 };
 
