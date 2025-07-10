@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from "express";
 import envVars from "../configs/env";
+import { AppError } from "../utils/AppError";
 
 const globalErrorHandler = (
   err: { message: string; stack: string },
@@ -7,11 +8,23 @@ const globalErrorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  res.status(500).json({
+  let message = "Something went wrong";
+  let statusCode = 500;
+  let stack = "";
+  if (err instanceof AppError) {
+    message = err.message;
+    statusCode = err.statusCode;
+    stack = err.stack;
+  } else if (err instanceof Error) {
+    message = err.message;
+    statusCode = 500; // Default to internal server error
+    stack = err.stack || "";
+  }
+
+  res.status(statusCode).json({
     success: false,
-    message: err?.message || "Internal Server Error",
-    error: err.message || "An unexpected error occurred",
-    stack: envVars.NODE_ENV === "development" ? err.stack : null,
+    message,
+    stack: envVars.NODE_ENV === "development" ? stack : null,
   });
 };
 
