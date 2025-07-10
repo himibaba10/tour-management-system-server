@@ -11,12 +11,18 @@ const createUser = async (payload: Partial<IUser>) => {
 
 const getUsers = async () => {
   const users = await User.find();
+  const totalUsers = await User.countDocuments();
 
-  if (users.length === 0) {
+  if (!totalUsers) {
     throw new AppError("No users found", httpStatus.NOT_FOUND);
   }
 
-  return users;
+  return {
+    data: users,
+    meta: {
+      total: totalUsers,
+    },
+  };
 };
 
 const userServices = {
