@@ -1,10 +1,31 @@
 import httpStatus from "http-status-codes";
 import AppError from "../../utils/AppError";
-import { IUser } from "./user.interface";
+import { AuthProvider, IAuthProvider, IUser } from "./user.interface";
 import User from "./user.model";
+import bcryptjs from "bcryptjs";
 
 const createUser = async (payload: Partial<IUser>) => {
-  const newUser = await User.create(payload);
+  const { email, password } = payload;
+  const existingUser = await User.findOne({ email });
+  if (existingUser) {
+    throw new AppError(
+      "User with this email already exists",
+      httpStatus.CONFLICT
+    );
+  }
+
+  const hashedPassword = await bcryptjs.hash(password as string, 10);
+
+  const authProvider: IAuthProvider = {
+    provider: AuthProvider.CREDENTIAL,
+    providerId: payload.email as string,
+  };
+
+  const newUser = await User.create({
+    ...payload,
+    password: hashedPassword,
+    auths: [authProvider],
+  });
 
   return newUser;
 };

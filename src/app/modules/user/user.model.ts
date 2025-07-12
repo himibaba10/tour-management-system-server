@@ -1,9 +1,19 @@
 import { model, Schema } from "mongoose";
-import { IAuthProvider, IsActive, IUser, Role } from "./user.interface";
+import {
+  AuthProvider,
+  IAuthProvider,
+  IsActive,
+  IUser,
+  Role,
+} from "./user.interface";
 
 const authProviderSchema = new Schema<IAuthProvider>(
   {
-    provider: { type: String, required: true },
+    provider: {
+      type: String,
+      enum: Object.values(AuthProvider),
+      required: true,
+    },
     providerId: { type: String, required: true },
   },
   {
@@ -27,7 +37,7 @@ const userSchema = new Schema<IUser>(
       default: IsActive.ACTIVE,
     },
     isVerified: { type: Boolean, default: false },
-    role: { type: String, enum: Object.values(Role), default: Role.USER }, // Assuming Role is an enum
+    role: { type: String, enum: Object.values(Role), default: Role.USER },
     auths: { type: [authProviderSchema], default: [] },
     bookings: [{ type: Schema.Types.ObjectId, ref: "Booking" }],
     guides: [{ type: Schema.Types.ObjectId, ref: "Guide" }],
