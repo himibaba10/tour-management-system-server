@@ -28,22 +28,20 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
-const updateUser = catchAsync(
-  async (req: Request & { user?: JwtPayload }, res: Response) => {
-    const updatedUser = await userServices.updateUser(
-      req.params.userId,
-      req.body,
-      req.user as JwtPayload
-    );
+const updateUser = catchAsync(async (req: Request, res: Response) => {
+  const updatedUser = await userServices.updateUser(
+    req.params.userId,
+    req.body,
+    req.user as JwtPayload
+  );
 
-    sendResponse(res, {
-      status: httpStatus.OK,
-      success: true,
-      message: "Users updated successfully",
-      data: updatedUser,
-    });
-  }
-);
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Users updated successfully",
+    data: updatedUser,
+  });
+});
 
 const userControllers = {
   createUser,
