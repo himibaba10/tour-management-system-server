@@ -19,4 +19,11 @@ userRoutes.post(
   userControllers.createUser
 );
 
+userRoutes.patch(
+  "/:userId",
+  checkAuth(),
+  validateRequest(userValidations.updateUserZodSchema),
+  userControllers.updateUser
+);
+
 export default userRoutes;

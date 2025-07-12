@@ -1,9 +1,10 @@
 import httpStatus from "http-status-codes";
 import AppError from "../../utils/AppError";
-import { AuthProvider, IAuthProvider, IUser } from "./user.interface";
+import { AuthProvider, IAuthProvider, IUser, Role } from "./user.interface";
 import User from "./user.model";
 import bcryptjs from "bcryptjs";
 import envVars from "../../configs/env";
+import { JwtPayload } from "jsonwebtoken";
 
 const createUser = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
@@ -50,9 +51,60 @@ const getUsers = async () => {
   };
 };
 
+const updateUser = async (
+  userId: string,
+  payload: Partial<IUser>,
+  userInfo: JwtPayload
+) => {
+  const existingUser = await User.findById(userId);
+  if (!existingUser) {
+    throw new AppError("User not found", httpStatus.NOT_FOUND);
+  }
+
+  if (payload.role) {
+    if (userInfo.role !== Role.ADMIN && userInfo.role !== Role.SUPER_ADMIN) {
+      throw new AppError(
+        "You are not allowed to change the role",
+        httpStatus.FORBIDDEN
+      );
+    }
+
+    if (userInfo.role === Role.ADMIN && payload.role === Role.SUPER_ADMIN) {
+      throw new AppError(
+        "You are not allowed to change the role to SUPER_ADMIN",
+        httpStatus.FORBIDDEN
+      );
+    }
+  }
+
+  if (payload.password) {
+    payload.password = await bcryptjs.hash(
+      payload.password,
+      parseInt(envVars.SALT as string)
+    );
+  }
+
+  if (payload.isDeleted || payload.isVerified) {
+    if (userInfo.role !== Role.ADMIN && userInfo.role !== Role.SUPER_ADMIN) {
+      throw new AppError(
+        "You are not allowed to change isDeleted or isVerified",
+        httpStatus.FORBIDDEN
+      );
+    }
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(userId, payload, {
+    new: true,
+    runValidators: true,
+  });
+
+  return updatedUser;
+};
+
 const userServices = {
   createUser,
   getUsers,
+  updateUser,
 };
 
 export default userServices;

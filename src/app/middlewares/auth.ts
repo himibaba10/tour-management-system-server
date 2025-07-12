@@ -12,7 +12,7 @@ export const checkAuth = (...authRoles: string[]) => {
   ) => {
     const userInfo = (await verifyAccessToken(req, res, next)) as JwtPayload;
 
-    if (!authRoles.includes(userInfo.role)) {
+    if (authRoles.length && !authRoles.includes(userInfo.role)) {
       throw new AppError(
         "You are not authorized to access this resource",
         httpStatus.FORBIDDEN
