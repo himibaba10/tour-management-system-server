@@ -12,20 +12,22 @@ export const generateAccessToken = (payload: JwtPayload) => {
   return accessToken;
 };
 
-export const verifyAccessToken = () => {
-  return async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const token = req.headers.authorization;
+export const verifyAccessToken = async (
+  req: Request,
+  res: Response,
+  next: NextFunction
+) => {
+  try {
+    const token = req.headers.authorization;
 
-      if (!token) {
-        throw new AppError("Access token is missing", httpStatus.UNAUTHORIZED);
-      }
-
-      const decoded = await jwt.verify(token, envVars.JWT_SECRET);
-
-      return decoded;
-    } catch (error) {
-      next(error);
+    if (!token) {
+      throw new AppError("Access token is missing", httpStatus.UNAUTHORIZED);
     }
-  };
+
+    const decoded = await jwt.verify(token, envVars.JWT_SECRET);
+
+    return decoded;
+  } catch (error) {
+    next(error);
+  }
 };
