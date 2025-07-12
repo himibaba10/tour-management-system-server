@@ -3,6 +3,7 @@ import { IUser } from "../user/user.interface";
 import User from "../user/user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
+import { generateAccessToken } from "../../utils/jwt";
 
 const credentialsLogin = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
@@ -20,8 +21,14 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     throw new AppError("Invalid credentials", httpStatus.BAD_REQUEST);
   }
 
-  return {
+  const accessToken = generateAccessToken({
+    _id: existingUser._id,
+    role: existingUser.role,
     email: existingUser.email,
+  });
+
+  return {
+    accessToken,
   };
 };
 
