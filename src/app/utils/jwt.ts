@@ -3,13 +3,23 @@ import envVars from "../configs/env";
 import { NextFunction, Request, Response } from "express";
 import AppError from "./AppError";
 import httpStatus from "http-status-codes";
+import { TokenType } from "../interfaces/tokenType";
 
-export const generateAccessToken = (payload: JwtPayload) => {
-  const accessToken = jwt.sign(payload, envVars.JWT_SECRET, {
-    expiresIn: envVars.JWT_EXPIRATION,
+export const generateToken = (type: TokenType, payload: JwtPayload) => {
+  const secret =
+    type === TokenType.ACCESS
+      ? envVars.JWT_ACCESS_SECRET
+      : envVars.JWT_REFRESH_SECRET;
+  const expirationDay =
+    type === TokenType.ACCESS
+      ? envVars.JWT_ACCESS_EXPIRATION
+      : envVars.JWT_REFRESH_EXPIRATION;
+
+  const token = jwt.sign(payload, secret, {
+    expiresIn: expirationDay,
   } as SignOptions);
 
-  return accessToken;
+  return token;
 };
 
 export const verifyAccessToken = async (
@@ -24,7 +34,7 @@ export const verifyAccessToken = async (
       throw new AppError("Access token is missing", httpStatus.UNAUTHORIZED);
     }
 
-    const decoded = await jwt.verify(token, envVars.JWT_SECRET);
+    const decoded = await jwt.verify(token, envVars.JWT_ACCESS_SECRET);
 
     return decoded;
   } catch (error) {
