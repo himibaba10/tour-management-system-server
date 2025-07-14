@@ -22,7 +22,7 @@ export const generateToken = (type: TokenType, payload: JwtPayload) => {
   return token;
 };
 
-export const verifyAccessToken = async (
+export const verifyToken = async (
   req: Request,
   res: Response,
   next: NextFunction

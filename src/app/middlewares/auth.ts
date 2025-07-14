@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
-import { verifyAccessToken } from "../utils/jwt";
+import { verifyToken } from "../utils/jwt";
 import { JwtPayload } from "jsonwebtoken";
 import AppError from "../utils/AppError";
 import httpStatus from "http-status-codes";
 
 export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const userInfo = (await verifyAccessToken(req, res, next)) as JwtPayload;
+    const userInfo = (await verifyToken(req, res, next)) as JwtPayload;
 
     if (authRoles.length && !authRoles.includes(userInfo.role)) {
       throw new AppError(

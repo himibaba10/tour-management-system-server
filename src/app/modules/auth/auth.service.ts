@@ -3,9 +3,7 @@ import { IUser } from "../user/user.interface";
 import User from "../user/user.model";
 import httpStatus from "http-status-codes";
 import bcryptjs from "bcryptjs";
-import { generateToken } from "../../utils/jwt";
-import { JwtPayload } from "jsonwebtoken";
-import { TokenType } from "../../interfaces/tokenType";
+import getUserTokens from "../../utils/getUserTokens";
 
 const credentialsLogin = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
@@ -23,14 +21,7 @@ const credentialsLogin = async (payload: Partial<IUser>) => {
     throw new AppError("Invalid credentials", httpStatus.BAD_REQUEST);
   }
 
-  const jwtPayload: JwtPayload = {
-    _id: existingUser._id,
-    role: existingUser.role,
-    email: existingUser.email,
-  };
-
-  const accessToken = generateToken(TokenType.ACCESS, jwtPayload);
-  const refreshToken = generateToken(TokenType.REFRESH, jwtPayload);
+  const { accessToken, refreshToken } = getUserTokens(existingUser);
 
   existingUser.password = undefined; // Remove password from the user object
 
