@@ -6,7 +6,13 @@ import httpStatus from "http-status-codes";
 
 export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const userInfo = (await verifyToken(req, res, next)) as JwtPayload;
+    const token = req.headers.authorization;
+
+    if (!token) {
+      throw new AppError("Access token is missing", httpStatus.UNAUTHORIZED);
+    }
+
+    const userInfo = (await verifyToken(token)) as JwtPayload;
 
     if (authRoles.length && !authRoles.includes(userInfo.role)) {
       throw new AppError(

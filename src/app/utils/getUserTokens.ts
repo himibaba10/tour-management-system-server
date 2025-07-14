@@ -1,6 +1,6 @@
 import { JwtPayload } from "jsonwebtoken";
 import { generateToken } from "./jwt";
-import { TokenType } from "../interfaces/tokenType";
+import { TokenType } from "../interfaces/enum";
 
 const getUserTokens = (user: JwtPayload) => {
   const jwtPayload: JwtPayload = {
