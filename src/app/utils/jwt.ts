@@ -24,17 +24,25 @@ export const generateToken = (type: TokenType, payload: JwtPayload) => {
 
 export const verifyToken = async (
   req: Request,
-  res: Response,
-  next: NextFunction
+  _res: Response,
+  next: NextFunction,
+  tokenType: TokenType = TokenType.ACCESS
 ) => {
   try {
-    const token = req.headers.authorization;
+    const token =
+      tokenType === TokenType.ACCESS
+        ? req.headers.authorization
+        : req.cookies.refreshToken;
+    const secret =
+      tokenType === TokenType.ACCESS
+        ? envVars.JWT_ACCESS_SECRET
+        : envVars.JWT_REFRESH_SECRET;
 
     if (!token) {
       throw new AppError("Access token is missing", httpStatus.UNAUTHORIZED);
     }
 
-    const decoded = await jwt.verify(token, envVars.JWT_ACCESS_SECRET);
+    const decoded = await jwt.verify(token, secret);
 
     return decoded;
   } catch (error) {
