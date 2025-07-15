@@ -4,7 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import authServices from "./auth.service";
 import setCookies from "../../utils/setCookies";
-import { CookieNames } from "../../interfaces/enum";
+import clearCookies from "../../utils/clearCookies";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
   const loginInfo = await authServices.credentialsLogin(req.body);
@@ -34,17 +34,7 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
 });
 
 const logout = catchAsync(async (req: Request, res: Response) => {
-  res.clearCookie(CookieNames.ACCESS_TOKEN, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-  });
-
-  res.clearCookie(CookieNames.REFRESH_TOKEN, {
-    httpOnly: true,
-    secure: false,
-    sameSite: "lax",
-  });
+  clearCookies(res);
 
   sendResponse(res, {
     status: httpStatus.OK,
