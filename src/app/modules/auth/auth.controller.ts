@@ -4,6 +4,7 @@ import catchAsync from "../../utils/catchAsync";
 import sendResponse from "../../utils/sendResponse";
 import authServices from "./auth.service";
 import setCookies from "../../utils/setCookies";
+import { CookieNames } from "../../interfaces/enum";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
   const loginInfo = await authServices.credentialsLogin(req.body);
@@ -32,9 +33,31 @@ const getNewAccessToken = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const logout = catchAsync(async (req: Request, res: Response) => {
+  res.clearCookie(CookieNames.ACCESS_TOKEN, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  res.clearCookie(CookieNames.REFRESH_TOKEN, {
+    httpOnly: true,
+    secure: false,
+    sameSite: "lax",
+  });
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "User logged out successfully",
+    data: null,
+  });
+});
+
 const authControllers = {
   credentialsLogin,
   getNewAccessToken,
+  logout,
 };
 
 export default authControllers;
