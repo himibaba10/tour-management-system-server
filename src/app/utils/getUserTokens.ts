@@ -1,6 +1,5 @@
 import { JwtPayload } from "jsonwebtoken";
 import { generateToken } from "./jwt";
-import { TokenType } from "../interfaces/enum";
 
 const getUserTokens = (user: JwtPayload) => {
   const jwtPayload: JwtPayload = {
@@ -9,13 +8,9 @@ const getUserTokens = (user: JwtPayload) => {
     email: user.email,
   };
 
-  const accessToken = generateToken(TokenType.ACCESS, jwtPayload);
-  const refreshToken = generateToken(TokenType.REFRESH, jwtPayload);
+  const tokens = generateToken(jwtPayload);
 
-  return {
-    accessToken,
-    refreshToken,
-  };
+  return tokens;
 };
 
 export default getUserTokens;

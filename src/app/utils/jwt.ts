@@ -3,21 +3,22 @@ import envVars from "../configs/env";
 import { TokenType } from "../interfaces/enum";
 import AppError from "./AppError";
 
-export const generateToken = (type: TokenType, payload: JwtPayload) => {
-  const secret =
-    type === TokenType.ACCESS
-      ? envVars.JWT_ACCESS_SECRET
-      : envVars.JWT_REFRESH_SECRET;
-  const expirationDay =
-    type === TokenType.ACCESS
-      ? envVars.JWT_ACCESS_EXPIRATION
-      : envVars.JWT_REFRESH_EXPIRATION;
+export const generateToken = (payload: JwtPayload) => {
+  const accessSecret = envVars.JWT_ACCESS_SECRET;
+  const refreshSecret = envVars.JWT_REFRESH_SECRET;
 
-  const token = jwt.sign(payload, secret, {
-    expiresIn: expirationDay,
+  const accessExpirationDay = envVars.JWT_ACCESS_EXPIRATION;
+  const refreshExpirationDay = envVars.JWT_REFRESH_EXPIRATION;
+
+  const accessToken = jwt.sign(payload, accessSecret, {
+    expiresIn: accessExpirationDay,
   } as SignOptions);
 
-  return token;
+  const refreshToken = jwt.sign(payload, refreshSecret, {
+    expiresIn: refreshExpirationDay,
+  } as SignOptions);
+
+  return { accessToken, refreshToken };
 };
 
 export const verifyToken = async (

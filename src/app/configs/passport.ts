@@ -2,7 +2,7 @@ import passport from "passport";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
 import envVars from "./env";
 import User from "../modules/user/user.model";
-import { AuthProvider, Role } from "../modules/user/user.interface";
+import { AuthProvider, IUser, Role } from "../modules/user/user.interface";
 
 passport.use(
   new GoogleStrategy(
@@ -48,3 +48,16 @@ passport.use(
     }
   )
 );
+
+passport.serializeUser((user, done) => {
+  return done(null, (user as IUser)._id);
+});
+
+passport.deserializeUser(async (id, done) => {
+  try {
+    const user = await User.findById(id);
+    done(null, user);
+  } catch (error) {
+    done(error, null);
+  }
+});

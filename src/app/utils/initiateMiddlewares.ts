@@ -3,11 +3,13 @@ import cors from "cors";
 import cookieParser from "cookie-parser";
 import expressSession from "express-session";
 import passport from "passport";
+import "../configs/passport";
+import envVars from "../configs/env";
 
 const initiateMiddlewares = (app: Application) => {
   app.use(
     expressSession({
-      secret: "Your secret",
+      secret: envVars.EXPRESS_SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
     })
