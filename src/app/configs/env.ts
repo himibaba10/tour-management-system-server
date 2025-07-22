@@ -13,6 +13,14 @@ const envVars = {
   JWT_REFRESH_EXPIRATION: process.env.JWT_REFRESH_EXPIRATION || "30d",
   NODE_ENV: process.env.NODE_ENV || "development",
   SALT: process.env.SALT || 10,
+  GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID || "your_google_client_id",
+  GOOGLE_CLIENT_SECRET:
+    process.env.GOOGLE_CLIENT_SECRET || "your_google_client_secret",
+  GOOGLE_CALLBACK_URI:
+    process.env.GOOGLE_CALLBACK_URI || "your_google_callback_uri",
+  EXPRESS_SESSION_SECRET:
+    process.env.EXPRESS_SESSION_SECRET || "your_express_session_secret",
+  FRONTEND_URI: process.env.FRONTEND_URI || "your_frontend_uri",
 };
 
 export default envVars;
