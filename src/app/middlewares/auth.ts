@@ -6,7 +6,7 @@ import httpStatus from "http-status-codes";
 
 export const checkAuth = (...authRoles: string[]) => {
   return async (req: Request, res: Response, next: NextFunction) => {
-    const token = req.headers.authorization;
+    const token = req.cookies.accessToken;
 
     if (!token) {
       throw new AppError("Access token is missing", httpStatus.UNAUTHORIZED);

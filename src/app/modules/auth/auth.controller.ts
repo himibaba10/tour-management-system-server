@@ -5,6 +5,7 @@ import sendResponse from "../../utils/sendResponse";
 import authServices from "./auth.service";
 import setCookies from "../../utils/setCookies";
 import clearCookies from "../../utils/clearCookies";
+import { JwtPayload } from "jsonwebtoken";
 
 const credentialsLogin = catchAsync(async (req: Request, res: Response) => {
   const loginInfo = await authServices.credentialsLogin(req.body);
@@ -44,10 +45,30 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const resetPassword = catchAsync(async (req: Request, res: Response) => {
+  const oldPassword = req.body.oldPassword;
+  const newPassword = req.body.newPassword;
+  const user = req.user;
+
+  await authServices.resetPassword(
+    user as JwtPayload,
+    oldPassword,
+    newPassword
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Password reset successful",
+    data: null,
+  });
+});
+
 const authControllers = {
   credentialsLogin,
   getNewAccessToken,
   logout,
+  resetPassword,
 };
 
 export default authControllers;
