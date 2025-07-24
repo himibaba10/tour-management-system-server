@@ -8,14 +8,7 @@ import { JwtPayload } from "jsonwebtoken";
 import hashPassword from "../../utils/hashPassword";
 
 const createUser = async (payload: Partial<IUser>) => {
-  const { email, password } = payload;
-  const existingUser = await User.findOne({ email });
-  if (existingUser) {
-    throw new AppError(
-      "User with this email already exists",
-      httpStatus.CONFLICT
-    );
-  }
+  const { password } = payload;
 
   const hashedPassword = await hashPassword(password as string);
 
