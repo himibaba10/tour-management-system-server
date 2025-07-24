@@ -2,6 +2,14 @@
 import { NextFunction, Request, Response } from "express";
 import envVars from "../configs/env";
 import AppError from "../utils/AppError";
+import {
+  handleAppError,
+  handleCastError,
+  handleDuplicateError,
+  handleError,
+  handleZodError,
+} from "../utils/handleError";
+import { IErrorSources } from "../interfaces/error";
 
 const globalErrorHandler = (
   err: any,
@@ -9,29 +17,34 @@ const globalErrorHandler = (
   res: Response,
   _next: NextFunction
 ) => {
-  console.log({ err });
   let message = "Something went wrong";
-  let statusCode = 500;
+  let statusCode = err.statusCode || 500;
+  let errorSources: any[] = [];
   const stack = err?.stack || "";
 
   // handle duplicate error
   if (err.code === 11000) {
-    message = `${err.keyValue.email} already exists!`;
+    message = handleDuplicateError(err).message;
+    statusCode = handleDuplicateError(err).statusCode;
   }
   // handle cast error
   else if (err.name === "CastError") {
-    message = `${err.path} is not valid`;
+    message = handleCastError(err).message;
+  }
+  // handle zod error
+  else if (err.name === "ZodError") {
+    message = handleZodError(err).message;
+    errorSources = handleZodError(err).errorSources as IErrorSources[];
   } else if (err instanceof AppError) {
-    message = err.message;
-    statusCode = err.statusCode;
+    message = handleAppError(err).message;
   } else if (err instanceof Error) {
-    message = err.message;
-    statusCode = 500; // Default to internal server error
+    message = handleError(err).message;
   }
 
   res.status(statusCode).json({
     success: false,
     message,
+    errorSources,
     stack: envVars.NODE_ENV === "development" ? stack : null,
   });
 };

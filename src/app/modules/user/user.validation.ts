@@ -3,16 +3,25 @@ import { IsActive, Role } from "./user.interface";
 
 const createUserZodSchema = z.object({
   name: z
-    .string({ invalid_type_error: "Name must be string" })
+    .string({
+      invalid_type_error: "Name must be string",
+      required_error: "Name is required",
+    })
     .min(2, { message: "Name must be at least 2 characters long." })
     .max(50, { message: "Name cannot exceed 50 characters." }),
   email: z
-    .string({ invalid_type_error: "Email must be string" })
+    .string({
+      invalid_type_error: "Email must be string",
+      required_error: "Email is required",
+    })
     .email({ message: "Invalid email address format." })
     .min(5, { message: "Email must be at least 5 characters long." })
     .max(100, { message: "Email cannot exceed 100 characters." }),
   password: z
-    .string({ invalid_type_error: "Password must be string" })
+    .string({
+      invalid_type_error: "Password must be string",
+      required_error: "Password is required",
+    })
     .min(8, { message: "Password must be at least 8 characters long." })
     .regex(/^(?=.*[A-Z])/, {
       message: "Password must contain at least 1 uppercase letter.",
