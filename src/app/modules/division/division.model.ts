@@ -13,6 +13,21 @@ const divisionSchema = new Schema<IDivision>(
   }
 );
 
+divisionSchema.pre("save", async function (next) {
+  if (this.isModified("name")) {
+    const baseSlug = this.name.toLowerCase().split(" ").join("-");
+    let slug = `${baseSlug}-division`;
+    let count = 0;
+    while (await Division.exists({ slug })) {
+      slug = `${slug}-${count++}`;
+    }
+
+    this.slug = slug;
+  }
+
+  next();
+});
+
 const Division = model<IDivision>("Division", divisionSchema);
 
 export default Division;
