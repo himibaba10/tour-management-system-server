@@ -1,45 +1,51 @@
-import { Schema, model } from "mongoose";
+import { model, Schema } from "mongoose";
 import { ITour, ITourType } from "./tour.interface";
 
-const TourTypeSchema = new Schema<ITourType>({
-  name: {
-    type: String,
-    required: true,
-    unique: true,
-    trim: true,
-  },
-});
-
-export const TourType = model<ITourType>("TourType", TourTypeSchema);
-
-const TourSchema = new Schema<ITour>(
+const tourTypeSchema = new Schema<ITourType>(
   {
-    title: { type: String, required: true, trim: true },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
+    name: { type: String, required: true, unique: true },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+export const TourType = model<ITourType>("TourType", tourTypeSchema);
+
+const tourSchema = new Schema<ITour>(
+  {
+    title: { type: String, required: true },
+    slug: { type: String, unique: true },
     description: { type: String },
     images: { type: [String], default: [] },
     location: { type: String },
     costFrom: { type: Number },
     startDate: { type: Date },
     endDate: { type: Date },
+    departureLocation: { type: String },
+    arrivalLocation: { type: String },
     included: { type: [String], default: [] },
     excluded: { type: [String], default: [] },
     amenities: { type: [String], default: [] },
     tourPlan: { type: [String], default: [] },
     maxGuest: { type: Number },
     minAge: { type: Number },
-    division: { type: Schema.Types.ObjectId, ref: "Division", required: true },
-    tourType: { type: Schema.Types.ObjectId, ref: "TourType", required: true },
+    division: {
+      type: Schema.Types.ObjectId,
+      ref: "Division",
+      required: true,
+    },
+    tourType: {
+      type: Schema.Types.ObjectId,
+      ref: "TourType",
+      required: true,
+    },
   },
-  { timestamps: true }
+  {
+    timestamps: true,
+  }
 );
 
-const Tour = model<ITour>("Tour", TourSchema);
+const Tour = model<ITour>("Tour", tourSchema);
 
 export default Tour;

@@ -1,40 +1,18 @@
-import { Schema, model, Document } from "mongoose";
+import { model, Schema } from "mongoose";
+import { IDivision } from "./division.interface";
 
-export interface IDivision extends Document {
-  name: string;
-  slug: string;
-  thumbnail?: string;
-  description?: string;
-}
-
-const DivisionSchema = new Schema<IDivision>(
+const divisionSchema = new Schema<IDivision>(
   {
-    name: {
-      type: String,
-      required: true,
-      trim: true,
-    },
-    slug: {
-      type: String,
-      required: true,
-      unique: true,
-      lowercase: true,
-      trim: true,
-    },
-    thumbnail: {
-      type: String,
-      default: null,
-    },
-    description: {
-      type: String,
-      default: null,
-    },
+    name: { type: String, required: true, unique: true },
+    slug: { type: String, unique: true },
+    thumbnail: { type: String },
+    description: { type: String },
   },
   {
     timestamps: true,
   }
 );
 
-const Division = model<IDivision>("Division", DivisionSchema);
+const Division = model<IDivision>("Division", divisionSchema);
 
 export default Division;
