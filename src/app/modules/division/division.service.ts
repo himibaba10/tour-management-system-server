@@ -22,6 +22,7 @@ const getAllDivisions = async () => {
     },
   };
 };
+
 const getSingleDivision = async (slug: string) => {
   const division = await Division.findOne({ slug });
   return {
@@ -43,18 +44,6 @@ const updateDivision = async (id: string, payload: Partial<IDivision>) => {
   if (duplicateDivision) {
     throw new Error("A division with this name already exists.");
   }
-
-  // if (payload.name) {
-  //     const baseSlug = payload.name.toLowerCase().split(" ").join("-")
-  //     let slug = `${baseSlug}-division`
-
-  //     let counter = 0;
-  //     while (await Division.exists({ slug })) {
-  //         slug = `${slug}-${counter++}` // dhaka-division-2
-  //     }
-
-  //     payload.slug = slug
-  // }
 
   const updatedDivision = await Division.findByIdAndUpdate(id, payload, {
     new: true,
