@@ -47,7 +47,7 @@ const tourSchema = new Schema<ITour>(
 );
 
 tourSchema.pre("save", async function (next) {
-  if (this.isModified("name")) {
+  if (this.isModified("title")) {
     let slug = this.title.toLowerCase().split(" ").join("-");
     let count = 0;
     while (await Tour.exists({ slug })) {
