@@ -42,6 +42,13 @@ const getUsers = async () => {
   };
 };
 
+const getSingleUser = async (id: string) => {
+  const user = await User.findById(id);
+  return {
+    data: user,
+  };
+};
+
 const updateUser = async (
   userId: string,
   payload: Partial<IUser>,
@@ -95,6 +102,7 @@ const updateUser = async (
 const userServices = {
   createUser,
   getUsers,
+  getSingleUser,
   updateUser,
 };
 

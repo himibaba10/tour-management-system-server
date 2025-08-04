@@ -28,6 +28,17 @@ const getUsers = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getSingleUser = catchAsync(async (req: Request, res: Response) => {
+  const id = req.params.id;
+  const result = await userServices.getSingleUser(id);
+  sendResponse(res, {
+    success: true,
+    status: httpStatus.CREATED,
+    message: "User Retrieved Successfully",
+    data: result.data,
+  });
+});
+
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const updatedUser = await userServices.updateUser(
     req.params.userId,
@@ -46,6 +57,7 @@ const updateUser = catchAsync(async (req: Request, res: Response) => {
 const userControllers = {
   createUser,
   getUsers,
+  getSingleUser,
   updateUser,
 };
 
