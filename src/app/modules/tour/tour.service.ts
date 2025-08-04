@@ -15,17 +15,6 @@ const createTour = async (payload: ITour) => {
 };
 
 const getAllTours = async (query: Record<string, string>) => {
-  const searchTerm = query.searchTerm || "";
-
-  const searchQuery = {
-    $or: tourSearchableFields.map((field) => ({
-      [field]: { $regex: searchTerm, $options: "i" },
-    })),
-  };
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const tours1 = await Tour.find(searchQuery).countDocuments();
-
   const toursQuery = new QueryBuilder(Tour.find(), query);
   const tours = await toursQuery
     .filter()
