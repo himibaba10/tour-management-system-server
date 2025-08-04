@@ -1,6 +1,6 @@
 import { Types } from "mongoose";
 
-export enum PaymentStatus {
+export enum PAYMENT_STATUS {
   PAID = "PAID",
   UNPAID = "UNPAID",
   CANCELLED = "CANCELLED",
@@ -13,6 +13,6 @@ export interface Payment {
   transactionId: string;
   amount: number;
   paymentGatewayData?: unknown;
-  invoiceUrl: string;
-  status: PaymentStatus;
+  invoiceUrl?: string;
+  status: PAYMENT_STATUS;
 }
