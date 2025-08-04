@@ -43,6 +43,13 @@ const getAllTours = async (query: Record<string, string>) => {
   };
 };
 
+const getSingleTour = async (slug: string) => {
+  const tour = await Tour.findOne({ slug });
+  return {
+    data: tour,
+  };
+};
+
 const updateTour = async (id: string, payload: Partial<ITour>) => {
   const existingTour = await Tour.findById(id);
 
@@ -105,6 +112,7 @@ const tourServices = {
   updateTourType,
   getAllTourTypes,
   getAllTours,
+  getSingleTour,
   updateTour,
   deleteTour,
 };

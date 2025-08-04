@@ -23,13 +23,14 @@ const getAllDivisions = catchAsync(async (req: Request, res: Response) => {
     meta: result.meta,
   });
 });
+
 const getSingleDivision = catchAsync(async (req: Request, res: Response) => {
   const slug = req.params.slug;
   const result = await divisionServices.getSingleDivision(slug);
   sendResponse(res, {
     status: 200,
     success: true,
-    message: "Divisions retrieved",
+    message: "Division retrieved",
     data: result.data,
   });
 });
