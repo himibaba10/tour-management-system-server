@@ -77,7 +77,7 @@ const createBooking = async (payload: IBooking, userId: string) => {
 
     return {
       booking: bookingData,
-      payment: sslPayment.GatewayPageURL,
+      paymentUrl: sslPayment.GatewayPageURL,
     };
   } catch (error) {
     await session.abortTransaction();

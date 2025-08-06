@@ -1,7 +1,22 @@
+import httpStatus from "http-status-codes";
 import { Request, Response } from "express";
 import catchAsync from "../../utils/catchAsync";
 import paymentServices from "./payment.service";
 import envVars from "../../configs/env";
+import sendResponse from "../../utils/sendResponse";
+
+const initPayment = catchAsync(async (req: Request, res: Response) => {
+  const result = await paymentServices.initPayment(
+    req.params.bookingId as string
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Tour created successfully",
+    data: result,
+  });
+});
 
 const successPayment = catchAsync(async (req: Request, res: Response) => {
   const { success, message } = await paymentServices.successPayment(
@@ -37,6 +52,7 @@ const cancelPayment = catchAsync(async (req: Request, res: Response) => {
 });
 
 const paymentControllers = {
+  initPayment,
   successPayment,
   failPayment,
   cancelPayment,
