@@ -7,9 +7,21 @@ import bookingControllers from "./booking.controller";
 
 const bookingRoutes = Router();
 
-bookingRoutes.get("/", checkAuth(Role.SUPER_ADMIN, Role.ADMIN));
-bookingRoutes.get("/:bookingId", checkAuth());
-bookingRoutes.get("/my-bookings", checkAuth());
+bookingRoutes.get(
+  "/",
+  checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
+  bookingControllers.getAllBookings
+);
+bookingRoutes.get(
+  "/:bookingId",
+  checkAuth(),
+  bookingControllers.getSingleBooking
+);
+bookingRoutes.get(
+  "/my-bookings",
+  checkAuth(),
+  bookingControllers.getUserBookings
+);
 
 bookingRoutes.post(
   "/",
@@ -19,9 +31,10 @@ bookingRoutes.post(
 );
 
 bookingRoutes.patch(
-  "/:id",
+  "/:bookingId",
   checkAuth(),
-  validateRequest(bookingValidations.updateBookingZodSchema)
+  validateRequest(bookingValidations.updateBookingZodSchema),
+  bookingControllers.updateBookingStatus
 );
 
 export default bookingRoutes;

@@ -86,8 +86,51 @@ const createBooking = async (payload: IBooking, userId: string) => {
   }
 };
 
+const getBookingById = async (bookingId: string) => {
+  const booking = await Booking.findById(bookingId)
+    .populate("user", "name email phone address")
+    .populate("tour", "title location costFrom")
+    .populate("payment");
+  return booking;
+};
+
+const getUserBookings = async (userId: string) => {
+  const bookings = await Booking.find({ user: userId })
+    .populate("user", "name email phone address")
+    .populate("tour", "title location costFrom")
+    .populate("payment");
+  return bookings;
+};
+
+const updateBookingStatus = async (
+  payload: Partial<IBooking>,
+  bookingId: string
+) => {
+  const booking = await Booking.findByIdAndUpdate(bookingId, payload, {
+    new: true,
+    runValidators: true,
+  })
+    .populate("user", "name email phone address")
+    .populate("tour", "title location costFrom")
+    .populate("payment");
+
+  return booking;
+};
+
+const getAllBookings = async () => {
+  const bookings = await Booking.find()
+    .populate("user", "name email phone address")
+    .populate("tour", "title location costFrom")
+    .populate("payment");
+  return bookings;
+};
+
 const bookingServices = {
   createBooking,
+  getUserBookings,
+  getBookingById,
+  updateBookingStatus,
+  getAllBookings,
 };
 
 export default bookingServices;
