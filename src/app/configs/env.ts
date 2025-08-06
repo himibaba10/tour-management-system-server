@@ -21,6 +21,16 @@ const envVars = {
   EXPRESS_SESSION_SECRET:
     process.env.EXPRESS_SESSION_SECRET || "your_express_session_secret",
   FRONTEND_URI: process.env.FRONTEND_URI || "your_frontend_uri",
+  SSL_STORE_ID: process.env.SSL_STORE_ID || "",
+  SSL_STORE_PASSWORD: process.env.SSL_STORE_PASSWORD || "",
+  SSL_PAYMENT_API: process.env.SSL_PAYMENT_API || "",
+  SSL_VALIDATION_API: process.env.SSL_VALIDATION_API || "",
+  SSL_SUCCESS_BACKEND_URL: process.env.SSL_SUCCESS_BACKEND_URL || "",
+  SSL_FAIL_BACKEND_URL: process.env.SSL_FAIL_BACKEND_URL || "",
+  SSL_CANCEL_BACKEND_URL: process.env.SSL_CANCEL_BACKEND_URL || "",
+  SSL_SUCCESS_FRONTEND_URL: process.env.SSL_SUCCESS_FRONTEND_URL || "",
+  SSL_FAIL_FRONTEND_URL: process.env.SSL_FAIL_FRONTEND_URL || "",
+  SSL_CANCEL_FRONTEND_URL: process.env.SSL_CANCEL_FRONTEND_URL || "",
 };
 
 export default envVars;

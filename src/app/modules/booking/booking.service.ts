@@ -5,6 +5,7 @@ import { IBooking } from "./booking.interface";
 import Booking from "./booking.model";
 import Payment from "../payment/payment.model";
 import Tour from "../tour/tour.model";
+import sslCommerzServices from "../sslCommerz/sslCommerz.service";
 
 const getTransactionId = () => {
   return `tran_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
@@ -15,7 +16,7 @@ const createBooking = async (payload: IBooking, userId: string) => {
   session.startTransaction();
   try {
     const user = await User.findById(userId)
-      .select("phone address")
+      .select("name email phone address")
       .session(session);
     if (!user?.phone || !user?.address) {
       throw new AppError(
@@ -55,14 +56,29 @@ const createBooking = async (payload: IBooking, userId: string) => {
     booking[0].payment = payment[0]._id;
     await booking[0].save();
 
+    const sslPayload = {
+      amount,
+      transactionId: payment[0].transactionId,
+      address: user.address,
+      name: user.name,
+      email: user.email,
+      phoneNumber: user.phone,
+    };
+
+    const sslPayment = await sslCommerzServices.sslPaymentInit(sslPayload);
+    const bookingData = await Booking.findById(booking[0]._id)
+      .session(session)
+      .populate("user", "name email phone address")
+      .populate("tour", "title location costFrom")
+      .populate("payment");
+
     await session.commitTransaction();
     session.endSession();
 
-    return (
-      await (
-        await booking[0].populate("user", "name email phone address")
-      ).populate("tour", "title location costFrom")
-    ).populate("payment");
+    return {
+      booking: bookingData,
+      payment: sslPayment.GatewayPageURL,
+    };
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
