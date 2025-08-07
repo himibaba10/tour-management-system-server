@@ -12,11 +12,13 @@ bookingRoutes.get(
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   bookingControllers.getAllBookings
 );
+
 bookingRoutes.get(
   "/:bookingId",
   checkAuth(),
   bookingControllers.getSingleBooking
 );
+
 bookingRoutes.get(
   "/my-bookings",
   checkAuth(),
