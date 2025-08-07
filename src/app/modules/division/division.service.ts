@@ -1,3 +1,5 @@
+import httpStatus from "http-status-codes";
+import AppError from "../../utils/AppError";
 import QueryBuilder from "../../utils/QueryBuilder";
 import { divisionSearchableFields } from "./division.constant";
 import { IDivision } from "./division.interface";
@@ -6,7 +8,10 @@ import Division from "./division.model";
 const createDivision = async (payload: IDivision) => {
   const existingDivision = await Division.findOne({ name: payload.name });
   if (existingDivision) {
-    throw new Error("A division with this name already exists.");
+    throw new AppError(
+      "A division with this name already exists.",
+      httpStatus.CONFLICT
+    );
   }
 
   const division = await Division.create(payload);
@@ -42,7 +47,7 @@ const getSingleDivision = async (slug: string) => {
 const updateDivision = async (id: string, payload: Partial<IDivision>) => {
   const existingDivision = await Division.findById(id);
   if (!existingDivision) {
-    throw new Error("Division not found.");
+    throw new AppError("Division not found.", httpStatus.NOT_FOUND);
   }
 
   const duplicateDivision = await Division.findOne({
@@ -51,7 +56,10 @@ const updateDivision = async (id: string, payload: Partial<IDivision>) => {
   });
 
   if (duplicateDivision) {
-    throw new Error("A division with this name already exists.");
+    throw new AppError(
+      "A division with this name already exists.",
+      httpStatus.CONFLICT
+    );
   }
 
   const updatedDivision = await Division.findByIdAndUpdate(id, payload, {

@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextFunction, Request, Response } from "express";
 import envVars from "../configs/env";
 import AppError from "../utils/AppError";
@@ -10,10 +9,11 @@ import {
   handleZodError,
 } from "../utils/handleError";
 import { IErrorSources } from "../interfaces/error";
+import deleteImageFromCloudinary from "../utils/deleteImageFromCloudinary";
 
-const globalErrorHandler = (
+const globalErrorHandler = async (
   err: any,
-  _req: Request,
+  req: Request,
   res: Response,
   _next: NextFunction
 ) => {
@@ -21,6 +21,16 @@ const globalErrorHandler = (
   let statusCode = err.statusCode || 500;
   let errorSources: any[] = [];
   const stack = err?.stack || "";
+
+  if (req.file) {
+    await deleteImageFromCloudinary(req.file.path);
+  }
+
+  if (req.files && Array.isArray(req.files) && req.files.length > 0) {
+    (req.files as Express.Multer.File[]).map(
+      async (file) => await deleteImageFromCloudinary(file.path)
+    );
+  }
 
   // handle duplicate error
   if (err.code === 11000) {

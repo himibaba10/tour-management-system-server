@@ -1,3 +1,4 @@
+import httpStatus from "http-status-codes";
 import jwt, { JwtPayload, SignOptions } from "jsonwebtoken";
 import envVars from "../configs/env";
 import { TokenType } from "../interfaces/enum";
@@ -25,9 +26,7 @@ export const verifyToken = async (
   token: string,
   tokenType: TokenType = TokenType.ACCESS
 ) => {
-  if (!token) {
-    throw new AppError("Token not found", 404);
-  }
+  if (!token) throw new AppError("Token not found", httpStatus.UNAUTHORIZED);
 
   const secret =
     tokenType === TokenType.ACCESS
