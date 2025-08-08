@@ -49,6 +49,8 @@ const globalErrorHandler = async (
     message = handleAppError(err).message;
   } else if (err instanceof Error) {
     message = handleError(err).message;
+  } else if (typeof err === "string") {
+    message = err;
   }
 
   res.status(statusCode).json({
