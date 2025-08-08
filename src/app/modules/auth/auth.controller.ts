@@ -13,7 +13,6 @@ import passport from "passport";
 
 const credentialsLogin = catchAsync(
   async (req: Request, res: Response, next: NextFunction) => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     passport.authenticate("local", (error: any, user: any, info: any) => {
       if (error) {
         return next(error);
@@ -67,12 +66,44 @@ const logout = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const setPassword = catchAsync(async (req: Request, res: Response) => {
+  const { password } = req.body;
+
+  await authServices.setPassword(req.user as JwtPayload, password);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Password successfully set",
+    data: null,
+  });
+});
+
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
   const oldPassword = req.body.oldPassword;
   const newPassword = req.body.newPassword;
   const user = req.user;
 
   await authServices.resetPassword(
+    user as JwtPayload,
+    oldPassword,
+    newPassword
+  );
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Password reset successful",
+    data: null,
+  });
+});
+
+const changePassword = catchAsync(async (req: Request, res: Response) => {
+  const oldPassword = req.body.oldPassword;
+  const newPassword = req.body.newPassword;
+  const user = req.user;
+
+  await authServices.changePassword(
     user as JwtPayload,
     oldPassword,
     newPassword
@@ -105,7 +136,9 @@ const authControllers = {
   credentialsLogin,
   getNewAccessToken,
   logout,
+  setPassword,
   resetPassword,
+  changePassword,
   googleCallback,
 };
 

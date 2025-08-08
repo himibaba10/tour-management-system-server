@@ -1,5 +1,10 @@
 import AppError from "../../utils/AppError";
-import { IsActive, IUser } from "../user/user.interface";
+import {
+  AuthProvider,
+  IAuthProvider,
+  IsActive,
+  IUser,
+} from "../user/user.interface";
 import User from "../user/user.model";
 import httpStatus from "http-status-codes";
 import getUserTokens from "../../utils/getUserTokens";
@@ -67,7 +72,57 @@ const getNewAccessToken = async (refreshToken: string) => {
   return { accessToken };
 };
 
+const setPassword = async (user: JwtPayload, password: string) => {
+  const existingUser = await User.findById(user._id);
+
+  if (!existingUser) {
+    throw new AppError("User not found", httpStatus.NOT_FOUND);
+  }
+
+  if (existingUser.password) {
+    throw new AppError("Password already set", httpStatus.BAD_REQUEST);
+  }
+
+  if (existingUser.auths.length === 0) {
+    throw new AppError(
+      "User has no authentication methods",
+      httpStatus.BAD_REQUEST
+    );
+  }
+
+  const hashedPassword = await hashPassword(password);
+
+  existingUser.password = hashedPassword;
+
+  const credentialAuthProvider: IAuthProvider = {
+    provider: AuthProvider.CREDENTIAL,
+    providerId: existingUser.email,
+  };
+
+  existingUser.auths.push(credentialAuthProvider);
+  await existingUser.save();
+};
+
 const resetPassword = async (
+  user: JwtPayload,
+  oldPassword: string,
+  newPassword: string
+) => {
+  const existingUser = await User.findById(user._id);
+
+  if (!existingUser) {
+    throw new AppError("User not found", httpStatus.NOT_FOUND);
+  }
+
+  await matchPassword(oldPassword, existingUser.password as string);
+
+  const hashedPassword = await hashPassword(newPassword);
+
+  existingUser.password = hashedPassword;
+  await existingUser.save();
+};
+
+const changePassword = async (
   user: JwtPayload,
   oldPassword: string,
   newPassword: string
@@ -89,7 +144,9 @@ const resetPassword = async (
 const authServices = {
   credentialsLogin,
   getNewAccessToken,
+  setPassword,
   resetPassword,
+  changePassword,
 };
 
 export default authServices;

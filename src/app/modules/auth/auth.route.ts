@@ -11,10 +11,22 @@ authRoutes.post("/login", authControllers.credentialsLogin);
 authRoutes.post("/refresh-token", authControllers.getNewAccessToken);
 authRoutes.post("/logout", authControllers.logout);
 authRoutes.post(
+  "/set-password",
+  checkAuth(),
+  validateRequest(authValidations.setPasswordZodSchema),
+  authControllers.setPassword
+);
+authRoutes.post(
   "/reset-password",
   checkAuth(),
   validateRequest(authValidations.resetPasswordZodSchema),
   authControllers.resetPassword
+);
+authRoutes.post(
+  "/change-password",
+  checkAuth(),
+  validateRequest(authValidations.changePasswordZodSchema),
+  authControllers.changePassword
 );
 
 // Routes for Google
@@ -30,6 +42,7 @@ authRoutes.get("/google", (req: Request, res: Response, next: NextFunction) => {
     state: redirect,
   })(req, res, next);
 });
+
 authRoutes.get(
   "/google/callback",
   passport.authenticate("google", { failureRedirect: "/login" }),

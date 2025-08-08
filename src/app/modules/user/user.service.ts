@@ -27,7 +27,7 @@ const createUser = async (payload: Partial<IUser>) => {
 };
 
 const getUsers = async () => {
-  const users = await User.find();
+  const users = await User.find().select("-password");
   const totalUsers = await User.countDocuments();
 
   if (!totalUsers) {
@@ -43,7 +43,14 @@ const getUsers = async () => {
 };
 
 const getSingleUser = async (id: string) => {
-  const user = await User.findById(id);
+  const user = await User.findById(id).select("-password");
+  return {
+    data: user,
+  };
+};
+
+const getMe = async (userId: string) => {
+  const user = await User.findById(userId).select("-password");
   return {
     data: user,
   };
@@ -55,9 +62,7 @@ const updateUser = async (
   userInfo: JwtPayload
 ) => {
   const existingUser = await User.findById(userId);
-  if (!existingUser) {
-    throw new AppError("User not found", httpStatus.NOT_FOUND);
-  }
+  if (!existingUser) throw new AppError("User not found", httpStatus.NOT_FOUND);
 
   if (payload.role) {
     if (userInfo.role !== Role.ADMIN && userInfo.role !== Role.SUPER_ADMIN) {
@@ -94,7 +99,7 @@ const updateUser = async (
   const updatedUser = await User.findByIdAndUpdate(userId, payload, {
     new: true,
     runValidators: true,
-  });
+  }).select("-password");
 
   return updatedUser;
 };
@@ -103,6 +108,7 @@ const userServices = {
   createUser,
   getUsers,
   getSingleUser,
+  getMe,
   updateUser,
 };
 

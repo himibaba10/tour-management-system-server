@@ -12,6 +12,7 @@ userRoutes.get(
   checkAuth(Role.SUPER_ADMIN, Role.ADMIN),
   userControllers.getUsers
 );
+userRoutes.get("/me", checkAuth(), userControllers.getMe);
 userRoutes.get("/:id", checkAuth(), userControllers.getSingleUser);
 
 userRoutes.post(

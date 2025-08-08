@@ -39,6 +39,17 @@ const getSingleUser = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getMe = catchAsync(async (req: Request, res: Response) => {
+  const userId = (req.user as JwtPayload)._id;
+  const result = await userServices.getMe(userId);
+  sendResponse(res, {
+    success: true,
+    status: httpStatus.CREATED,
+    message: "User Profile retrieved Successfully",
+    data: result.data,
+  });
+});
+
 const updateUser = catchAsync(async (req: Request, res: Response) => {
   const updatedUser = await userServices.updateUser(
     req.params.userId,
@@ -58,6 +69,7 @@ const userControllers = {
   createUser,
   getUsers,
   getSingleUser,
+  getMe,
   updateUser,
 };
 
