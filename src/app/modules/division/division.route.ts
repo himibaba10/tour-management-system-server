@@ -20,14 +20,15 @@ divisionRoutes.post(
 );
 
 divisionRoutes.patch(
-  "/:id",
+  "/:divisionId",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  multerUpload.single("file"),
   validateRequest(divisionValidations.updateDivisionSchema),
   divisionControllers.updateDivision
 );
 
 divisionRoutes.delete(
-  "/:id",
+  "/:divisionId",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   divisionControllers.deleteDivision
 );

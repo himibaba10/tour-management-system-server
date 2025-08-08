@@ -44,7 +44,12 @@ const getSingleTour = catchAsync(async (req: Request, res: Response) => {
 });
 
 const updateTour = catchAsync(async (req: Request, res: Response) => {
-  const result = await tourServices.updateTour(req.params.id, req.body);
+  const payload: Partial<ITour> = {
+    ...req.body,
+    images: (req.files as Express.Multer.File[]).map((file) => file.path),
+  };
+
+  const result = await tourServices.updateTour(req.params.tourId, payload);
   sendResponse(res, {
     status: 200,
     success: true,
@@ -54,8 +59,7 @@ const updateTour = catchAsync(async (req: Request, res: Response) => {
 });
 
 const deleteTour = catchAsync(async (req: Request, res: Response) => {
-  const { id } = req.params;
-  const result = await tourServices.deleteTour(id);
+  const result = await tourServices.deleteTour(req.params.tourId);
   sendResponse(res, {
     status: 200,
     success: true,

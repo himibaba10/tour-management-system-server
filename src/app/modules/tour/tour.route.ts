@@ -44,14 +44,15 @@ tourRoutes.post(
 );
 
 tourRoutes.patch(
-  "/:id",
+  "/:tourId",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  multerUpload.array("files"),
   validateRequest(tourValidations.updateTourZodSchema),
   tourControllers.updateTour
 );
 
 tourRoutes.delete(
-  "/:id",
+  "/:tourId",
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   tourControllers.deleteTour
 );

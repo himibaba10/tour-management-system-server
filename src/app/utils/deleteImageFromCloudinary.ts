@@ -5,7 +5,7 @@ import AppError from "./AppError";
 
 const deleteImageFromCloudinary = async (url: string) => {
   try {
-    const publicId = url.split("/").pop()!.split(".")[0];
+    const publicId = new URL(url).pathname.split("/").pop()!.split(".")[0];
 
     await cloudinaryUpload.uploader.destroy(publicId);
   } catch (error) {
