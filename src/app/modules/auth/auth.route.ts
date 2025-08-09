@@ -29,6 +29,11 @@ authRoutes.post(
   validateRequest(authValidations.changePasswordZodSchema),
   authControllers.changePassword
 );
+authRoutes.post(
+  "/forgot-password",
+  validateRequest(authValidations.forgotPasswordZodSchema),
+  authControllers.forgotPassword
+);
 
 // Routes for Google
 authRoutes.get("/google", (req: Request, res: Response, next: NextFunction) => {

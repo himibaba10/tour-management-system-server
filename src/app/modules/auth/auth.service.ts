@@ -13,6 +13,9 @@ import { TokenType } from "../../interfaces/enum";
 import { JwtPayload } from "jsonwebtoken";
 import hashPassword from "../../utils/hashPassword";
 import matchPassword from "../../utils/matchPassword";
+import envVars from "../../configs/env";
+import sendEmail from "../../utils/sendEmail";
+import isLegitUser from "../../utils/isLegitUser";
 
 const credentialsLogin = async (payload: Partial<IUser>) => {
   const { email, password } = payload;
@@ -103,23 +106,15 @@ const setPassword = async (user: JwtPayload, password: string) => {
   await existingUser.save();
 };
 
-const resetPassword = async (
-  user: JwtPayload,
-  oldPassword: string,
-  newPassword: string
-) => {
+const resetPassword = async (user: JwtPayload, newPassword: string) => {
   const existingUser = await User.findById(user._id);
 
-  if (!existingUser) {
-    throw new AppError("User not found", httpStatus.NOT_FOUND);
-  }
-
-  await matchPassword(oldPassword, existingUser.password as string);
+  isLegitUser(existingUser);
 
   const hashedPassword = await hashPassword(newPassword);
 
-  existingUser.password = hashedPassword;
-  await existingUser.save();
+  existingUser!.password = hashedPassword;
+  await existingUser!.save();
 };
 
 const changePassword = async (
@@ -141,12 +136,37 @@ const changePassword = async (
   await existingUser.save();
 };
 
+const forgotPassword = async (email?: string) => {
+  const user = (await User.findOne({ email })) as IUser;
+
+  isLegitUser(user);
+
+  const { accessToken } = getUserTokens(user, {
+    expiresIn: "10m",
+  });
+
+  const resetUILink = `${envVars.FRONTEND_URI}/reset-password?id=${user._id}&token=${accessToken}`;
+
+  await sendEmail({
+    to: user.email,
+    subject: "Forgot password link",
+    templateName: "forgetPassword",
+    templateData: {
+      name: user.name,
+      resetUILink,
+    },
+  });
+
+  return true;
+};
+
 const authServices = {
   credentialsLogin,
   getNewAccessToken,
   setPassword,
   resetPassword,
   changePassword,
+  forgotPassword,
 };
 
 export default authServices;

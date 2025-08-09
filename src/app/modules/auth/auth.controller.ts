@@ -80,15 +80,10 @@ const setPassword = catchAsync(async (req: Request, res: Response) => {
 });
 
 const resetPassword = catchAsync(async (req: Request, res: Response) => {
-  const oldPassword = req.body.oldPassword;
   const newPassword = req.body.newPassword;
   const user = req.user;
 
-  await authServices.resetPassword(
-    user as JwtPayload,
-    oldPassword,
-    newPassword
-  );
+  await authServices.resetPassword(user as JwtPayload, newPassword);
 
   sendResponse(res, {
     status: httpStatus.OK,
@@ -117,6 +112,17 @@ const changePassword = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const forgotPassword = catchAsync(async (req: Request, res: Response) => {
+  const success = await authServices.forgotPassword(req.body.email);
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success,
+    message: "A link is sent to your mail to forget the password",
+    data: null,
+  });
+});
+
 const googleCallback = catchAsync(async (req: Request, res: Response) => {
   const user = req.user;
   const redirect = req.query.state;
@@ -139,6 +145,7 @@ const authControllers = {
   setPassword,
   resetPassword,
   changePassword,
+  forgotPassword,
   googleCallback,
 };
 

@@ -42,10 +42,17 @@ const changePasswordZodSchema = z.object({
     }),
 });
 
+const forgotPasswordZodSchema = z.object({
+  email: z
+    .string({ invalid_type_error: "Email must be string" })
+    .email({ message: "Invalid email format" }),
+});
+
 const authValidations = {
   setPasswordZodSchema,
   resetPasswordZodSchema,
   changePasswordZodSchema,
+  forgotPasswordZodSchema,
 };
 
 export default authValidations;

@@ -4,9 +4,14 @@ import envVars from "../configs/env";
 import { TokenType } from "../interfaces/enum";
 import AppError from "./AppError";
 
-export const generateToken = (payload: JwtPayload) => {
+export const generateToken = (payload: JwtPayload, options?: SignOptions) => {
   const accessSecret = envVars.JWT_ACCESS_SECRET;
   const refreshSecret = envVars.JWT_REFRESH_SECRET;
+
+  if (options) {
+    const accessToken = jwt.sign(payload, accessSecret, options);
+    return { accessToken };
+  }
 
   const accessExpirationDay = envVars.JWT_ACCESS_EXPIRATION;
   const refreshExpirationDay = envVars.JWT_REFRESH_EXPIRATION;
