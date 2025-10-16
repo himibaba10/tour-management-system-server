@@ -39,6 +39,10 @@ const envVars = {
   SMTP_USER: process.env.SMTP_USER || "",
   SMTP_FROM: process.env.SMTP_FROM || "",
   SMTP_PASS: process.env.SMTP_PASS || "",
+  REDIS_USERNAME: process.env.REDIS_USERNAME || "default",
+  REDIS_PASSWORD: process.env.REDIS_PASSWORD || "",
+  REDIS_HOST: process.env.REDIS_HOST || "localhost",
+  REDIS_PORT: process.env.REDIS_PORT || "6379",
 };
 
 export default envVars;
