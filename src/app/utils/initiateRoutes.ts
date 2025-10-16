@@ -5,6 +5,7 @@ import divisionRoutes from "../modules/division/division.route";
 import tourRoutes from "../modules/tour/tour.route";
 import bookingRoutes from "../modules/booking/booking.route";
 import paymentRoutes from "../modules/payment/payment.route";
+import otpRoutes from "../modules/otp/otp.route";
 
 const initiateRoutes = (app: Application) => {
   const apiVersion = "/api/v1";
@@ -19,6 +20,7 @@ const initiateRoutes = (app: Application) => {
   app.use(`${apiVersion}/tour`, tourRoutes);
   app.use(`${apiVersion}/booking`, bookingRoutes);
   app.use(`${apiVersion}/payment`, paymentRoutes);
+  app.use(`${apiVersion}/otp`, otpRoutes);
 };
 
 export default initiateRoutes;
