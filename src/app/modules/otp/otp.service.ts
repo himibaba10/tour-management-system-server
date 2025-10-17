@@ -39,8 +39,31 @@ const sendOtp = async ({ email, name }: Pick<IUser, "email" | "name">) => {
   });
 };
 
-const verifyOtp = async () => {
-  return {};
+const verifyOtp = async ({ email, otp }: { email: string; otp: string }) => {
+  const existingUser = await User.findOne({ email });
+  if (!existingUser) {
+    throw new AppError("User not found", httpStatus.NOT_FOUND);
+  }
+
+  if (existingUser.isVerified) {
+    throw new AppError("User is already verified", httpStatus.BAD_REQUEST);
+  }
+
+  const redisKey = `otp:${email}`;
+  const storedOtp = await redisClient.get(redisKey);
+
+  if (!storedOtp || storedOtp !== otp) {
+    throw new AppError("Invalid or expired OTP", httpStatus.BAD_REQUEST);
+  }
+
+  Promise.all([
+    await User.findOneAndUpdate(
+      { email },
+      { isVerified: true },
+      { runValidators: true }
+    ),
+    await redisClient.del([redisKey]),
+  ]);
 };
 
 const otpServices = {
