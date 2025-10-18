@@ -203,11 +203,21 @@ const cancelPayment = async (query: Record<string, string>) => {
   }
 };
 
+const getInvoiceDownloadUrl = async (paymentId: string) => {
+  const payment = await Payment.findById(paymentId);
+
+  if (!payment || !payment.invoiceUrl) {
+    throw new AppError("Invoice not found", httpStatus.NOT_FOUND);
+  }
+  return payment.invoiceUrl;
+};
+
 const paymentServices = {
   initPayment,
   successPayment,
   failPayment,
   cancelPayment,
+  getInvoiceDownloadUrl,
 };
 
 export default paymentServices;
