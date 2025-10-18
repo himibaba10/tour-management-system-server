@@ -10,6 +10,7 @@ import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
 import generatePdf, { IInvoiceData } from "../../utils/generatePdf";
 import { ITour } from "../tour/tour.interface";
 import sendEmail from "../../utils/sendEmail";
+import uploadBufferToCloudinary from "../../utils/uploadBufferToCloudinary";
 
 const initPayment = async (bookingId: string) => {
   const session = await Booking.startSession();
@@ -99,6 +100,13 @@ const successPayment = async (query: Record<string, string>) => {
 
     const pdfBuffer = await generatePdf(invoiceData);
 
+    const cloudinaryResult = (await uploadBufferToCloudinary(
+      pdfBuffer,
+      "invoice"
+    )) as { secure_url: string };
+
+    updatedPayment.invoiceUrl = cloudinaryResult.secure_url;
+
     await sendEmail({
       to: (updatedBooking.user as unknown as IUser).email,
       subject: "Booking invoice",
@@ -113,6 +121,7 @@ const successPayment = async (query: Record<string, string>) => {
       ],
     });
 
+    await updatedPayment.save({ session });
     await session.commitTransaction();
     session.endSession();
 
