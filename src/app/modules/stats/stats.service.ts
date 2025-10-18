@@ -176,9 +176,92 @@ const getTourStats = async () => {
   };
 };
 
+const getBookingStats = async () => {
+  const totalBookingPromise = Booking.countDocuments();
+
+  const totalBookingsByStatusPromise = Booking.aggregate([
+    {
+      $group: {
+        _id: "$bookingStatus",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const bookingsPerTourPromise = Booking.aggregate([
+    {
+      $lookup: {
+        from: "tours",
+        localField: "tour",
+        foreignField: "_id",
+        as: "tour",
+      },
+    },
+    {
+      $unwind: "$tour",
+    },
+    {
+      $group: {
+        _id: "$tour.title",
+        totalBookings: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const avgGuestCountPerBookingPromise = Booking.aggregate([
+    {
+      $group: {
+        _id: null,
+        averageGuestCount: { $avg: "$guestCount" },
+      },
+    },
+  ]);
+
+  const bookingsInLast7DaysPromise = Booking.countDocuments({
+    createdAt: { $gte: new Date(sevenDaysAgo) },
+  });
+
+  const bookingsInLast30DaysPromise = Booking.countDocuments({
+    createdAt: { $gte: new Date(thirtyDaysAgo) },
+  });
+
+  const bookingsByUniqueUsersPromise = Booking.distinct("user").then(
+    (users) => users.length
+  );
+
+  const [
+    totalBooking,
+    totalBookingsByStatus,
+    bookingsPerTour,
+    avgGuestCountPerBooking,
+    bookingsInLast7Days,
+    bookingsInLast30Days,
+    bookingsByUniqueUsers,
+  ] = await Promise.all([
+    totalBookingPromise,
+    totalBookingsByStatusPromise,
+    bookingsPerTourPromise,
+    avgGuestCountPerBookingPromise,
+    bookingsInLast7DaysPromise,
+    bookingsInLast30DaysPromise,
+    bookingsByUniqueUsersPromise,
+  ]);
+
+  return {
+    totalBooking,
+    totalBookingsByStatus,
+    bookingsPerTour,
+    avgGuestCountPerBooking: avgGuestCountPerBooking[0].averageGuestCount,
+    bookingsInLast7Days,
+    bookingsInLast30Days,
+    bookingsByUniqueUsers,
+  };
+};
+
 const statsServices = {
   getUserStats,
   getTourStats,
+  getBookingStats,
 };
 
 export default statsServices;
