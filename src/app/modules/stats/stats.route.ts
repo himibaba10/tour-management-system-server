@@ -11,4 +11,10 @@ statsRoutes.get(
   statsControllers.getUserStats
 );
 
+statsRoutes.get(
+  "/tour",
+  checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
+  statsControllers.getTourStats
+);
+
 export default statsRoutes;

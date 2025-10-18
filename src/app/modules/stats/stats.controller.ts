@@ -10,13 +10,25 @@ const getUserStats = catchAsync(async (req: Request, res: Response) => {
   sendResponse(res, {
     status: httpStatus.OK,
     success: true,
-    message: "Users updated successfully",
+    message: "user stat fetched successfully",
+    data: stats,
+  });
+});
+
+const getTourStats = catchAsync(async (req: Request, res: Response) => {
+  const stats = await statsServices.getTourStats();
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Tour stat fetched successfully",
     data: stats,
   });
 });
 
 const statsControllers = {
   getUserStats,
+  getTourStats,
 };
 
 export default statsControllers;

@@ -1,3 +1,5 @@
+import Booking from "../booking/booking.model";
+import Tour from "../tour/tour.model";
 import { IsActive } from "../user/user.interface";
 import User from "../user/user.model";
 
@@ -79,8 +81,104 @@ const getUserStats = async () => {
   };
 };
 
+const getTourStats = async () => {
+  const allToursPromise = Tour.countDocuments();
+
+  const totalTourByTourTypesPromise = Tour.aggregate([
+    {
+      $lookup: {
+        from: "tourtypes",
+        localField: "tourType",
+        foreignField: "_id",
+        as: "tourTypeDetails",
+      },
+    },
+    {
+      $unwind: "$tourTypeDetails",
+    },
+    {
+      $group: {
+        _id: "$tourTypeDetails.name",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const avgTourCostPromise = Tour.aggregate([
+    {
+      $group: {
+        _id: null,
+        averageCost: { $avg: "$costFrom" },
+      },
+    },
+  ]);
+
+  const totalTourByDivisionsPromise = Tour.aggregate([
+    {
+      $lookup: {
+        from: "divisions",
+        localField: "division",
+        foreignField: "_id",
+        as: "division",
+      },
+    },
+    {
+      $unwind: "$division",
+    },
+    {
+      $group: {
+        _id: "$division.name",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const totalHighestBookingPromise = Booking.aggregate([
+    {
+      $lookup: {
+        from: "tours",
+        localField: "tour",
+        foreignField: "_id",
+        as: "tour",
+      },
+    },
+    {
+      $unwind: "$tour",
+    },
+    {
+      $group: {
+        _id: "$tour.title",
+        totalBookings: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const [
+    allTours,
+    totalTourByTourTypes,
+    avgTourCost,
+    totalTourByDivisions,
+    totalHighestBooking,
+  ] = await Promise.all([
+    allToursPromise,
+    totalTourByTourTypesPromise,
+    avgTourCostPromise,
+    totalTourByDivisionsPromise,
+    totalHighestBookingPromise,
+  ]);
+
+  return {
+    allTours,
+    totalTourByTourTypes,
+    avgTourCost,
+    totalTourByDivisions,
+    totalHighestBooking,
+  };
+};
+
 const statsServices = {
   getUserStats,
+  getTourStats,
 };
 
 export default statsServices;
