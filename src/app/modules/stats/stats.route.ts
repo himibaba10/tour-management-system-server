@@ -13,4 +13,6 @@ statsRoutes.get("/tour", statsControllers.getTourStats);
 
 statsRoutes.get("/booking", statsControllers.getBookingStats);
 
+statsRoutes.get("/payment", statsControllers.getPaymentStats);
+
 export default statsRoutes;

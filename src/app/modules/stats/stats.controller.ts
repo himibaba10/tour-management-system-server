@@ -37,10 +37,22 @@ const getBookingStats = catchAsync(async (req: Request, res: Response) => {
   });
 });
 
+const getPaymentStats = catchAsync(async (req: Request, res: Response) => {
+  const stats = await statsServices.getPaymentStats();
+
+  sendResponse(res, {
+    status: httpStatus.OK,
+    success: true,
+    message: "Payment stat fetched successfully",
+    data: stats,
+  });
+});
+
 const statsControllers = {
   getUserStats,
   getTourStats,
   getBookingStats,
+  getPaymentStats,
 };
 
 export default statsControllers;

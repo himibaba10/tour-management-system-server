@@ -1,4 +1,6 @@
 import Booking from "../booking/booking.model";
+import { PAYMENT_STATUS } from "../payment/payment.interface";
+import Payment from "../payment/payment.model";
 import Tour from "../tour/tour.model";
 import { IsActive } from "../user/user.interface";
 import User from "../user/user.model";
@@ -258,10 +260,60 @@ const getBookingStats = async () => {
   };
 };
 
+const getPaymentStats = async () => {
+  const totalPaymentPromise = Payment.countDocuments();
+
+  const totalPaymentByStatusPromise = Payment.aggregate([
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 },
+      },
+    },
+  ]);
+
+  const totalRevenuePromise = Payment.aggregate([
+    {
+      $match: { status: PAYMENT_STATUS.PAID },
+    },
+    {
+      $group: {
+        _id: null,
+        totalAmount: { $sum: "$amount" },
+      },
+    },
+  ]);
+
+  const avgPaymentAmountPromise = Payment.aggregate([
+    {
+      $group: {
+        _id: null,
+        averageAmount: { $avg: "$amount" },
+      },
+    },
+  ]);
+
+  const [totalPayment, totalPaymentByStatus, totalRevenue, avgPaymentAmount] =
+    await Promise.all([
+      totalPaymentPromise,
+      totalPaymentByStatusPromise,
+      totalRevenuePromise,
+      avgPaymentAmountPromise,
+    ]);
+
+  return {
+    totalPayment,
+    totalPaymentByStatus,
+    totalRevenue: totalRevenue[0].totalAmount,
+    avgPaymentAmount,
+  };
+};
+
 const statsServices = {
   getUserStats,
   getTourStats,
   getBookingStats,
+  getPaymentStats,
 };
 
 export default statsServices;
