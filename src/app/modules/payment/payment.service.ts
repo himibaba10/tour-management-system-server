@@ -7,6 +7,9 @@ import { PAYMENT_STATUS } from "./payment.interface";
 import Payment from "./payment.model";
 import { IUser } from "../user/user.interface";
 import { ISSLCommerz } from "../sslCommerz/sslCommerz.interface";
+import generatePdf, { IInvoiceData } from "../../utils/generatePdf";
+import { ITour } from "../tour/tour.interface";
+import sendEmail from "../../utils/sendEmail";
 
 const initPayment = async (bookingId: string) => {
   const session = await Booking.startSession();
@@ -67,7 +70,7 @@ const successPayment = async (query: Record<string, string>) => {
       { session, new: true, runValidators: true }
     );
 
-    await Booking.findByIdAndUpdate(
+    const updatedBooking = await Booking.findByIdAndUpdate(
       updatedPayment?.booking,
       {
         bookingStatus: BOOKING_STATUS.COMPLETE,
@@ -77,7 +80,38 @@ const successPayment = async (query: Record<string, string>) => {
         new: true,
         runValidators: true,
       }
-    );
+    )
+      .populate("user", "name email")
+      .populate("tour", "title");
+
+    if (!updatedBooking || !updatedPayment) {
+      throw new AppError("Booking or payment not found", httpStatus.NOT_FOUND);
+    }
+
+    const invoiceData: IInvoiceData = {
+      transactionId: query.transactionId,
+      username: (updatedBooking.user as unknown as IUser).name,
+      bookingDate: updatedBooking.createdAt as Date,
+      guestCount: updatedBooking.guestCount,
+      totalCost: updatedPayment.amount,
+      tourTitle: (updatedBooking.tour as unknown as ITour).title,
+    };
+
+    const pdfBuffer = await generatePdf(invoiceData);
+
+    await sendEmail({
+      to: (updatedBooking.user as unknown as IUser).email,
+      subject: "Booking invoice",
+      templateName: "invoice",
+      templateData: invoiceData,
+      attachments: [
+        {
+          filename: "invoice.pdf",
+          contentType: "application/pdf",
+          content: pdfBuffer,
+        },
+      ],
+    });
 
     await session.commitTransaction();
     session.endSession();
