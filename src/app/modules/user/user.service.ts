@@ -2,8 +2,6 @@ import httpStatus from "http-status-codes";
 import AppError from "../../utils/AppError";
 import { AuthProvider, IAuthProvider, IUser, Role } from "./user.interface";
 import User from "./user.model";
-import bcryptjs from "bcryptjs";
-import envVars from "../../configs/env";
 import { JwtPayload } from "jsonwebtoken";
 import hashPassword from "../../utils/hashPassword";
 
@@ -78,13 +76,6 @@ const updateUser = async (
         httpStatus.FORBIDDEN
       );
     }
-  }
-
-  if (payload.password) {
-    payload.password = await bcryptjs.hash(
-      payload.password,
-      parseInt(envVars.SALT as string)
-    );
   }
 
   if (payload.isDeleted || payload.isVerified) {
