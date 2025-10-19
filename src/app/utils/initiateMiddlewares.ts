@@ -17,8 +17,14 @@ const initiateMiddlewares = (app: Application) => {
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(express.json());
+  app.set("trust proxy", 1);
   app.use(express.urlencoded({ extended: true }));
-  app.use(cors());
+  app.use(
+    cors({
+      origin: envVars.FRONTEND_URI,
+      credentials: true,
+    })
+  );
   app.use(cookieParser());
 };
 
