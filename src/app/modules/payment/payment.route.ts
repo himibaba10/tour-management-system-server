@@ -16,4 +16,6 @@ paymentRoutes.get(
   paymentControllers.getInvoiceDownloadUrl
 );
 
+paymentRoutes.post("/validate-payment", paymentControllers.validatePayment);
+
 export default paymentRoutes;
