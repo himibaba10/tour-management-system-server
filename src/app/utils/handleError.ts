@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
 import mongoose from "mongoose";
 import { IErrorResponse } from "../interfaces/error";
 import { ZodError } from "zod";

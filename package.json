@@ -6,7 +6,9 @@
     "start": "node dist/app.js",
     "start:dev": "ts-node-dev --respawn --transpile-only src/app.ts",
     "lint": "npx eslint ./src",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "tsc && npm run copy-templates",
+    "copy-templates": "xcopy src\\app\\utils\\templates dist\\app\\utils\\templates /E /I /Y"
   },
   "keywords": [],
   "author": "",

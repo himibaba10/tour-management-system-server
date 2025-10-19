@@ -1,5 +1,5 @@
 import httpStatus from "http-status-codes";
-import { redisClient } from "../../configs/redis";
+import { getRedisClient } from "../../configs/redis";
 import { OTP_EXPIRY_TIME } from "../../constants";
 import AppError from "../../utils/AppError";
 import generateOtp from "../../utils/generateOtp";
@@ -21,7 +21,7 @@ const sendOtp = async ({ email, name }: Pick<IUser, "email" | "name">) => {
 
   const redisKey = `otp:${email}`;
 
-  await redisClient.set(redisKey, otp, {
+  await getRedisClient().set(redisKey, otp, {
     expiration: {
       type: "EX",
       value: OTP_EXPIRY_TIME,
@@ -50,7 +50,7 @@ const verifyOtp = async ({ email, otp }: { email: string; otp: string }) => {
   }
 
   const redisKey = `otp:${email}`;
-  const storedOtp = await redisClient.get(redisKey);
+  const storedOtp = await getRedisClient().get(redisKey);
 
   if (!storedOtp || storedOtp !== otp) {
     throw new AppError("Invalid or expired OTP", httpStatus.BAD_REQUEST);
@@ -62,7 +62,7 @@ const verifyOtp = async ({ email, otp }: { email: string; otp: string }) => {
       { isVerified: true },
       { runValidators: true }
     ),
-    await redisClient.del([redisKey]),
+    await getRedisClient().del([redisKey]),
   ]);
 };
 
